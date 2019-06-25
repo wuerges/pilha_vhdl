@@ -27,8 +27,8 @@ architecture principal of pilha is
 	
 		begin
 				       
-				
-				--DATA_OUT <=  (others =>(others => '0'));
+				--DATA <=(others =>(others => '0'));
+				--DATA_OUT <=(others => '0');
 
 				process(RESET, DATA_IN, POP, PUSH, FULL, EMPTY)
 				variable PTR: integer;
