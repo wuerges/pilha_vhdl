@@ -7,6 +7,8 @@ entity pilha is
 			DATA_IN : In std_logic_vector(7 downto 0);
 			POP : In std_logic;
 			PUSH : In std_logic;
+			cheio: out std_logic;
+			vazio : out std_logic;
 			leds : out std_logic_vector(7 downto 0);
 			DATA_OUT : out std_logic_vector(7 downto 0));
 end entity;
@@ -20,69 +22,59 @@ end entity;
 
 architecture principal of pilha is
 
-	type DATA_ARRAY is array (integer range <>) of std_ulogic_vector(0 to 7);
+	type DATA_ARRAY is array (integer range <>) of std_logic_vector(0 to 7);
 	signal DATA: DATA_ARRAY (0 to 7);
 	signal FULL: std_logic;
 	signal EMPTY: std_logic;
 	
 		begin
-				       
-				--DATA <=(others =>(others => '0'));
-				--DATA_OUT <=(others => '0');
-
 				process(RESET, DATA_IN, POP, PUSH, FULL, EMPTY)
 				variable PTR: integer;
 				begin
 														
 					-- CONDIÇÕES PARA CONTROLE DA PILA, FULL OU EMPTY---
-					if PTR = 7 then
-						FULL <= '1';
-					else 
-						FULL <= '0';
-					end if;
+				--	if PTR = 8 then
+				--		FULL <= '1';
+					--	cheio <= '1';
+					--else 
+			--			FULL <= '0';
+			--		end if;
 					---------------------------
-					if PTR = 0 then
-						EMPTY <= '1';
-					else	
-						EMPTY <= '0';
-					end if;
+			--		if PTR = 0 then
+			--			EMPTY <= '1';
+			--			vazio <= '1';
+			--		else	
+			--			EMPTY <= '0';
+			--		end if;
 				--------------------------------------------
 									
-					if RESET = '1' then 
+					if RESET = '0' then 
 						FULL <= '0';
-						EMPTY <= '1';
+						EMPTY <= '0';
 						PTR:= 0;
+						DATA <=(others =>(others => '0'));
+						DATA_OUT <=(others => '0');
+						leds(0) <= '0';
+						leds(1) <= '0';
+						leds(2) <= '0';
+						leds(3) <= '0';
+						leds(4) <= '0';
+						leds(5) <= '0';
+						leds(6) <= '0';
+						
 						
 					elsif PUSH = '1' and FULL = '0' then 
-						DATA(PTR)(0) <= DATA_IN(0);
-						DATA(PTR)(1) <= DATA_IN(1);
-						DATA(PTR)(2) <= DATA_IN(2);
-						DATA(PTR)(3) <= DATA_IN(3);
-						DATA(PTR)(4) <= DATA_IN(4);
-						DATA(PTR)(5) <= DATA_IN(5);
-						DATA(PTR)(6) <= DATA_IN(6);
-						DATA(PTR)(7) <= DATA_IN(7);
+						DATA(PTR) <= DATA_IN;
 						
 						PTR:=(PTR+1);
 							
-					elsif POP = '1' and EMPTY = '0' then
-						
+					elsif POP = '1' and EMPTY = '0' then					
 						PTR := (PTR - 1);
-						
 					end if;								
 					
-									-----------------------------------------
-				
-				
+				-----------------------------------------
 				-- SAÍDA PARA O BCD----------	
-				DATA_OUT(0) <= DATA(PTR)(0);
-				DATA_OUT(1) <= DATA(PTR)(1);
-				DATA_OUT(2) <=	DATA(PTR)(2);
-				DATA_OUT(3) <=	DATA(PTR)(3);
-				DATA_OUT(4) <=	DATA(PTR)(4);
-				DATA_OUT(5) <=	DATA(PTR)(5);
-				DATA_OUT(6) <=	DATA(PTR)(6);
-				DATA_OUT(7) <=	DATA(PTR)(7);
+				DATA_OUT <= DATA(PTR);
 				------------------------------
 				
 			--COND. P/ ANALISAR SAIDA NOS LEDS DO PONTEIRO---
@@ -109,9 +101,7 @@ architecture principal of pilha is
 					
 				elsif PTR = 8 then
 					leds(7) <= '1';
-					
 				end if;
 				------------------------------
 			end process;
-				
 end architecture;
