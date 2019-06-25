@@ -1,0 +1,72 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity pilha2 is
+  Port ( CLK : In std_logic;
+			RESET :In std_logic;
+			DATA_IN : In std_logic_vector(7 downto 0);
+			RD : In std_logic;
+			WR : In std_logic;
+			DATA_OUT : Out std_logic_vector(7 downto 0));
+end entity;
+
+Architecture SYNTHESIZABLE of pilha2 is
+				type DATA_ARRAY;
+				type STATUS_TYPE;
+				-- Define PROFUNDIDADE of Stack
+				constant DEPTH: Integer := 16;
+				-- Define Data Array
+				type DATA_ARRAY is array (Integer range <> ) of Std_logic_vector( 7 downto 0 );
+				signal DATA: DATA_ARRAY (0 to (DEPTH-1));
+				-- Define type for Lifo Status
+				type STATUS_TYPE is ( EMPTY, NOT_EMPTY);
+				Signal STATUS: STATUS_TYPE;
+				-- Define pointer index
+				Signal PTR: Integer range 0 to DEPTH-1;
+				
+				-- Define Function INCR_PTR
+				-- Increments in range ( 0 to DEPTH - 1 )
+				Function INCR_PTR (PTR : Integer; DEPTH: Integer)
+					Return Integer is
+					
+				begin
+					If PTR = (DEPTH - 1)
+						then Return (DEPTH - 1);
+					Else
+						Return PTR + 1;
+					End if;
+						End INCR_PTR;
+				
+				Begin
+					LIFO_PROC: Process (CLK, RESET)
+				
+				Begin
+				
+					If RESET = '1' then
+						PTR <= 0;
+						DATA_OUT <= "00000000";
+
+					Elsif Rising_Edge (CLK) then
+						If WR = '1' then
+							DATA (0) <= DATA_IN;
+							If RD = '0' or STATUS = EMPTY then
+								for i in 1 to (DEPTH - 1) loop
+									DATA (i) <= DATA (i-I);
+								End loop;
+								PTR <= INCR_PTR ( PTR, DEPTH ); -- Function Call
+							End if;
+						End if;
+						If RD = '1' and STATUS = NOT_EMPTY then
+							DATA_OUT <= DATA (0);
+							If WR = '0' then
+								for i in 1 to (DEPTH-1) loop
+									DATA (i-1) <= DATA (i);
+								End loop;
+								PTR <= PTR - 1;
+							End if;
+						End if;
+					End if;
+				End Process LIFO_PROC;
+				-- Monitor Lifo Status
+	STATUS <= EMPTY when PTR = 0 Else NOT_EMPTY;	
+End SYNTHESIZABLE;
