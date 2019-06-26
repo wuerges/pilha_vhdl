@@ -30,28 +30,18 @@ architecture principal of pilha is
 		begin
 				process(RESET, DATA_IN, POP, PUSH, FULL, EMPTY)
 				variable PTR: integer;
+                variable P : std_logic;
 				begin
-														
-					-- CONDIÇÕES PARA CONTROLE DA PILA, FULL OU EMPTY---
-				--	if PTR = 8 then
-				--		FULL <= '1';
-					--	cheio <= '1';
-					--else 
-			--			FULL <= '0';
-			--		end if;
-					---------------------------
-			--		if PTR = 0 then
-			--			EMPTY <= '1';
-			--			vazio <= '1';
-			--		else	
-			--			EMPTY <= '0';
-			--		end if;
-				--------------------------------------------
+                    FULL <= PTR = 8;
+                    EMPTY <= PTR = 0;
+
+                    -- SAÍDA PARA O BCD----------	
+                    DATA_OUT <= DATA(PTR);
+                    ------------------------------
 									
 					if RESET = '0' then 
-						FULL <= '0';
-						EMPTY <= '0';
 						PTR:= 0;
+                        P <= '0';
 						DATA <=(others =>(others => '0'));
 						DATA_OUT <=(others => '0');
 						leds(0) <= '0';
@@ -63,45 +53,49 @@ architecture principal of pilha is
 						leds(6) <= '0';
 						
 						
-					elsif PUSH = '1' and FULL = '0' then 
+					elsif PUSH = '1' and FULL = '0' and P = '0' then 
 						DATA(PTR) <= DATA_IN;
+                        P <= '1';
 						
 						PTR:=(PTR+1);
 							
-					elsif POP = '1' and EMPTY = '0' then					
+					elsif POP = '1' and EMPTY = '0' and P = '0' then					
+                        P <= '1';
 						PTR := (PTR - 1);
+                    elsif PUSH = '0' and POP = '0' and P = '1' then
+                        P <= '0';
+                    else then
+
 					end if;								
+                    
 					
 				-----------------------------------------
-				-- SAÍDA PARA O BCD----------	
-				DATA_OUT <= DATA(PTR);
-				------------------------------
 				
 			--COND. P/ ANALISAR SAIDA NOS LEDS DO PONTEIRO---
-				if PTR = 1 then
-					leds(0) <= '1';
-				
-				elsif PTR = 2 then
-					leds(1) <= '1';
-					
-				elsif PTR = 3 then
-					leds(2) <= '1';
-				
-				elsif PTR = 4 then
-					leds(3) <= '1';
-					
-				elsif PTR = 5 then
-					leds(4) <= '1';
-					
-				elsif PTR = 6 then
-					leds(5) <= '1';
+				--if PTR = 1 then
+--------			leds(0) <= '1';
+--------		
+--------		elsif PTR = 2 then
+--------			leds(1) <= '1';
+--------			
+--------		elsif PTR = 3 then
+--------			leds(2) <= '1';
+--------		
+--------		elsif PTR = 4 then
+--------			leds(3) <= '1';
+--------			
+--------		elsif PTR = 5 then
+--------			leds(4) <= '1';
+--------			
+--------		elsif PTR = 6 then
+--------			leds(5) <= '1';
 
-				elsif PTR = 7 then
-					leds(6) <= '1';
-					
-				elsif PTR = 8 then
-					leds(7) <= '1';
-				end if;
+--------		elsif PTR = 7 then
+--------			leds(6) <= '1';
+--------			
+--------		elsif PTR = 8 then
+--------			leds(7) <= '1';
+--------		end if;
 				------------------------------
 			end process;
 end architecture;
